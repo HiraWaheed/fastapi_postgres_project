@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "task project"
+version = "0.1.0"
+description = "A project of FastAPI with PostgresSQL"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "0.112.1"
+uvicorn = "^0.32.0"
+pydantic = "^2.9.2"
+alembic = "^1.14.0"
+celery = "^5.4.0"
+SQLAlchemy = "^2.0.36"
+black = "^24.10.0"
+pytest = "^8.3.3"
+pytest-cov = "^6.0.0"
+pre-commit = "^4.0.1"
+PyJWT = "^2.9.0"
+passlib = "^1.7.4"
+python-dotenv = "^1.0.1"
+psycopg2 = "^2.9.10"
+psycopg2-binary = "^2.9.10"
+bcrypt = "^4.2.0"
+python-multipart = "^0.0.17"
+redis = "^5.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
