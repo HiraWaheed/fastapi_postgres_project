@@ -6,7 +6,7 @@ from app.utils.helper import (
     verify_password,
     create_access_token,
 )
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.constants import ALGORITHM
@@ -43,9 +43,15 @@ def register_user(user_data: UserSchema.UserCreate, db: Session = Depends(get_db
         db.refresh(new_user)
 
         return new_user
+    except HTTPException as e:
+        logging.error(f"HTTPException occurred at register_user: {e.detail}")
+        raise e  # Re-raise the HTTPException with the correct status code and detail
     except Exception as e:
-        logging.error(f"Something went wrong:{e}")
-        return "Something went wrong."
+        logging.error(f"Something went wrong: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Something went wrong.",
+        )
 
 
 @router.post("/login", response_model=UserSchema.UserToken | str)
@@ -65,9 +71,15 @@ def login(
         access_token = create_access_token(data={"username": user.username})
         return UserSchema.UserToken(access_token=access_token, token_type="bearer")
 
+    except HTTPException as e:
+        logging.error(f"HTTPException occurred at register_user: {e.detail}")
+        raise e  # Re-raise the HTTPException with the correct status code and detail
     except Exception as e:
-        logging.error(f"Something went wrong:{e}")
-        return "Something went wrong."
+        logging.error(f"Something went wrong: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Something went wrong.",
+        )
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
@@ -89,6 +101,7 @@ def get_current_user(
         if user is None:
             raise HTTPException(status_code=401, detail="Invalid user")
         return user
+
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"Invalid token {e}")
 
