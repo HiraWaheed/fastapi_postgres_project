@@ -1,6 +1,8 @@
+import os
 import csv
 from io import StringIO
 import logging
+from dotenv import load_dotenv
 from celery import Celery
 from celery.result import AsyncResult
 from fastapi import APIRouter, HTTPException
@@ -8,9 +10,12 @@ from fastapi.responses import FileResponse
 import app.models.candidate as CandidateModel
 from app.database import SessionLocal
 
+load_dotenv()
 router = APIRouter()
 celery = Celery(
-    "tasks", broker="redis://localhost:6379/0", backend="redis://localhost:6379/0"
+    "tasks",
+    broker=os.getenv("CELERY_BROKER_URL"),
+    backend=os.getenv("CELERY_RESULT_BACKEND"),
 )
 
 

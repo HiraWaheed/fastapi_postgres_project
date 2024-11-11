@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 from sqlalchemy import or_
 from app.api.user import get_current_user
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import app.models.candidate as CandidateModel
 import app.models.user as UserModel
@@ -30,17 +30,6 @@ def add_candidate(
         candidate(CandidateCreateResponse | str): newly created candidate id
     """
     try:
-        # Check if the user already has a candidate profile
-        existing_candidate = (
-            db.query(CandidateModel.Candidate)
-            .filter(CandidateModel.Candidate.user_id == current_user.id)
-            .first()
-        )
-        if existing_candidate:
-            raise HTTPException(
-                status_code=400, detail="User already has a candidate profile"
-            )
-
         # Create new candidate profile
         new_candidate = CandidateModel.Candidate(
             user_id=current_user.id,
@@ -165,8 +154,11 @@ def delete_candidate(
         logging.error(f"HTTPException occurred at delete_candidate: {e.detail}")
         return e.detail
     except Exception as e:
-        logging.error(f"Error occurred at delete_candidate{e}")
-        return "Something went wrong while deleting candidate profile"
+        logging.error(f"Something went wrong: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Something went wrong.",
+        )
 
 
 @router.get("/all-candidates", response_model=dict | str)
